@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A simple AI-powered text summarizer demo.">
+  <title>Briefly — AI Text Summarizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light; --ink:#182230; --muted:#64748b; --paper:#f6f7fb; --card:#ffffff; --line:#e5e9f2; --brand:#4f46e5; --brand-dark:#3730a3; --mint:#d9f8e8; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:'DM Sans',sans-serif; }
+    .shell { max-width:1120px; margin:0 auto; padding:28px 22px 48px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:48px; }
+    .brand { display:flex; align-items:center; gap:11px; font-family:Manrope,sans-serif; font-size:21px; font-weight:800; letter-spacing:-.6px; }
+    .logo { display:grid; place-items:center; width:38px; height:38px; border-radius:13px; color:#fff; background:var(--brand); font-size:19px; box-shadow:0 7px 18px #4f46e533; }
+    .tag { border:1px solid #d9d7ff; color:var(--brand-dark); background:#eeedff; padding:7px 12px; border-radius:99px; font-size:12px; font-weight:700; }
+    .hero { max-width:760px; margin:0 auto 30px; text-align:center; }
+    .eyebrow { color:var(--brand); text-transform:uppercase; letter-spacing:2px; font-size:11px; font-weight:700; }
+    h1 { margin:13px 0 12px; font-family:Manrope,sans-serif; font-size:clamp(34px,5vw,54px); line-height:1.08; letter-spacing:-2px; }
+    h1 span { color:var(--brand); }
+    .hero p { margin:0 auto; max-width:600px; color:var(--muted); font-size:16px; line-height:1.7; }
+    .workspace { display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:stretch; }
+    .panel { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:22px; box-shadow:0 12px 36px #19254408; min-width:0; }
+    .panel-top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:17px; }
+    h2 { margin:0; font-family:Manrope,sans-serif; font-size:17px; letter-spacing:-.3px; }
+    .step { color:var(--muted); font-size:12px; }
+    textarea { width:100%; min-height:270px; resize:vertical; padding:15px; border:1px solid var(--line); border-radius:13px; outline:none; font:14px/1.65 'DM Sans',sans-serif; color:var(--ink); background:#fcfcff; }
+    textarea:focus, select:focus { border-color:#8b85ff; box-shadow:0 0 0 3px #4f46e51a; }
+    .meta { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:10px 0 17px; color:var(--muted); font-size:12px; }
+    .text-btn { border:0; background:transparent; color:var(--brand); font:600 12px 'DM Sans',sans-serif; cursor:pointer; padding:0; }
+    .controls { display:flex; gap:10px; align-items:center; }
+    select { min-width:0; flex:1; padding:12px 11px; border:1px solid var(--line); border-radius:11px; background:white; color:var(--ink); font:13px 'DM Sans',sans-serif; }
+    button { cursor:pointer; }
+    .primary { border:0; border-radius:11px; background:var(--brand); color:white; font:700 13px 'DM Sans',sans-serif; padding:13px 16px; transition:background .15s,transform .15s; }
+    .primary:hover { background:var(--brand-dark); transform:translateY(-1px); }
+    .primary:disabled { opacity:.6; cursor:wait; transform:none; }
+    .output { min-height:270px; padding:17px; border:1px dashed #d8dbea; border-radius:13px; background:#fbfbff; color:#344054; font-size:14px; line-height:1.75; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .empty { min-height:230px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:var(--muted); gap:10px; }
+    .empty-icon { display:grid; place-items:center; width:48px; height:48px; border-radius:16px; background:#eeedff; color:var(--brand); font-size:22px; }
+    .empty strong { color:#344054; font-size:14px; }
+    .empty span { max-width:230px; font-size:12px; line-height:1.6; }
+    .output-footer { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:13px; }
+    .status { color:var(--muted); font-size:12px; }
+    .copy { border:1px solid var(--line); border-radius:10px; background:white; padding:9px 12px; color:#344054; font:600 12px 'DM Sans',sans-serif; }
+    .note { display:flex; gap:10px; align-items:flex-start; max-width:760px; margin:22px auto 0; padding:14px 16px; border:1px solid #d7f0e1; background:#f0fff6; border-radius:13px; color:#35664c; font-size:12px; line-height:1.6; }
+    .note b { color:#205b3a; }
+    footer { text-align:center; color:#98a2b3; font-size:11px; margin-top:35px; }
+    @media(max-width:760px) { .shell{padding:20px 14px 35px} header{margin-bottom:34px} .workspace{grid-template-columns:1fr} textarea{min-height:220px} .output{min-height:220px} .empty{min-height:175px} .panel{padding:17px} }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="brand"><div class="logo">✳</div>briefly<span style="color:#9aa4b2;font-weight:500">.ai</span></div>
+      <div class="tag">AI-POWERED SUMMARY</div>
+    </header>
+    <section class="hero">
+      <div class="eyebrow">Less reading. More understanding.</div>
+      <h1>Big text, <span>clear ideas.</span></h1>
+      <p>Turn long text into useful takeaways in seconds. Paste an article, notes, or a passage and let AI help you find the essentials.</p>
+    </section>
+    <section class="workspace" aria-label="Summarizer workspace">
+      <div class="panel">
+        <div class="panel-top"><h2>Source text</h2><span class="step">01 / INPUT</span></div>
+        <textarea id="sourceText" maxlength="20000" placeholder="Paste the text you want to summarize here…"></textarea>
+        <div class="meta"><span id="count">0 characters</span><button class="text-btn" id="sampleBtn" type="button">Try sample text ↗</button></div>
+        <div class="controls">
+          <select id="style" aria-label="Summary style">
+            <option value="short">Quick bullets</option>
+            <option value="balanced" selected>Balanced summary</option>
+            <option value="detailed">Detailed summary</option>
+          </select>
+          <button id="summarizeBtn" class="primary" type="button">✦ Summarize</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-top"><h2>Your summary</h2><span class="step">02 / RESULT</span></div>
+        <div id="output" class="output"><div class="empty"><div class="empty-icon">✧</div><strong>Your summary will appear here</strong><span>Your key ideas, simplified and organised, ready to read or copy.</span></div></div>
+        <div class="output-footer"><span id="status" class="status">Ready when you are</span><button id="copyBtn" class="copy" type="button" disabled>Copy summary</button></div>
+      </div>
+    </section>
+    <div class="note"><span>ⓘ</span><div><b>Use AI thoughtfully.</b> Summaries can omit context or make mistakes. Check important details against the original text and avoid pasting confidential or personal information into this demo.</div></div>
+    <footer>Briefly AI · Student project prototype · Built for clearer reading</footer>
+  </main>
+  <script>
+    const sourceText = document.getElementById('sourceText');
+    const count = document.getElementById('count');
+    const summarizeBtn = document.getElementById('summarizeBtn');
+    const output = document.getElementById('output');
+    const status = document.getElementById('status');
+    const copyBtn = document.getElementById('copyBtn');
+    const sample = `Artificial intelligence is increasingly being used in education to support both students and teachers. AI-powered tools can help students revise complex topics, generate practice questions, and receive explanations at their own pace. Teachers can use these systems to draft learning materials and identify topics where students may need additional support. However, AI tools can sometimes produce inaccurate information, reflect biases in their training data, or give answers that sound confident despite being wrong. Educational institutions should therefore teach students to verify important claims, protect personal information, and use AI as a learning assistant rather than a replacement for independent thinking. The most effective approach combines the speed of AI with human judgement, subject knowledge, and clear rules for responsible use.`;
+
+    sourceText.addEventListener('input', () => { count.textContent = `${sourceText.value.length.toLocaleString()} characters`; });
+    document.getElementById('sampleBtn').addEventListener('click', () => { sourceText.value = sample; sourceText.dispatchEvent(new Event('input')); });
+    summarizeBtn.addEventListener('click', async () => {
+      const text = sourceText.value.trim();
+      if (text.length < 40) { status.textContent = 'Please enter at least 40 characters.'; sourceText.focus(); return; }
+      summarizeBtn.disabled = true; summarizeBtn.textContent = 'Working…'; status.textContent = 'AI is reading your text…'; copyBtn.disabled = true;
+      output.textContent = 'Generating your summary…';
+      try {
+        const response = await fetch('/api/summarize', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ text, style:document.getElementById('style').value }) });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+        output.textContent = data.summary;
+        status.textContent = 'Summary generated · Please verify key facts';
+        copyBtn.disabled = false;
+      } catch (error) {
+        output.textContent = error.message || 'Could not connect. Make sure the local server is running.';
+        status.textContent = 'Could not generate summary';
+      } finally { summarizeBtn.disabled = false; summarizeBtn.textContent = '✦ Summarize'; }
+    });
+    copyBtn.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(output.textContent); status.textContent = 'Copied to clipboard'; }
+      catch { status.textContent = 'Clipboard unavailable; select and copy the text manually.'; }
+    });
+  </script>
+</body>
+</html>
